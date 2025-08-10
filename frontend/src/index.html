@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weather App MVP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #f0f8ff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    input, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    #weather {
+      margin-top: 1.5rem;
+    }
+    #weather img {
+      vertical-align: middle;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Weather App</h1>
+  <input type="text" id="cityInput" placeholder="Enter city name" />
+  <button id="fetchBtn">Get Weather</button>
+
+  <div id="weather"></div>
+
+  <script>
+    const fetchBtn = document.getElementById('fetchBtn');
+    const cityInput = document.getElementById('cityInput');
+    const weatherDiv = document.getElementById('weather');
+
+    fetchBtn.addEventListener('click', async () => {
+      const city = cityInput.value.trim();
+      if (!city) {
+        weatherDiv.innerHTML = '<p class="error">Please enter a city name.</p>';
+        return;
+      }
+
+      weatherDiv.innerHTML = 'Loading...';
+
+      try {
+        // Replace this IP:PORT with your backend's WSL2 IP and port if needed
+        const backendURL = 'http://172.26.64.90:3000/weather';
+
+        const response = await fetch(`${backendURL}?city=${encodeURIComponent(city)}`);
+
+        if (!response.ok) {
+          throw new Error('City not found or API error');
+        }
+
+        const data = await response.json();
+
+        weatherDiv.innerHTML = `
+          <h2>${data.city}</h2>
+          <p><strong>${data.temperature}°C</strong></p>
+          <p>${data.condition}</p>
+          <img src="${data.icon}" alt="${data.condition}" />
+        `;
+      } catch (error) {
+        weatherDiv.innerHTML = `<p class="error">${error.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
